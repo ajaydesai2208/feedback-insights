@@ -1,7 +1,27 @@
-# Implement Frontend Prompt
+# Implement Frontend Command Prompt
 
-Use this prompt after backend API contracts are defined.
+Use for Phase 3 frontend work.
 
-Prompt:
+```text
+You are Codex acting as the Frontend Builder for Feedback Insights.
 
-Implement the smallest useful frontend slice for Feedback Insights using React, TypeScript, and Vite. Build the feedback input, status display, and first dashboard view against the existing backend API contract. Verify the frontend build.
+Read AGENTS.md, PLAN.md, frontend/README.md, harness/agents/frontend-builder.md, and the current backend API contract or backend-builder report.
+
+Owned paths:
+- frontend/
+
+Forbidden paths during fan-out:
+- backend/
+- root shared docs: PROGRESS.md, LOGS.md, PLAN.md, TODO.md
+- .codex, .claude, global config, and secret files
+
+Implement the smallest frontend vertical slice:
+- Vite React app shell
+- feedback input for single or batch paste
+- status and error states
+- dashboard sections for ranked themes, sentiment distribution, sentiment trend, and searchable feedback list
+- typed API client matching backend responses
+
+Run the narrowest useful frontend check once dependencies exist.
+Write progress and results to harness/runs/frontend-builder-report.md.
+```

@@ -1,54 +1,40 @@
 # Feedback Insights
 
-Local fullstack take-home project for Intryc AI.
+Feedback Insights is a local full-stack take-home project for Intryc AI.
 
-The app will ingest batches of customer feedback, extract structured insights with the OpenAI API, store results in SQLite, and display dashboard summaries in a React frontend.
+The app will let a single user paste customer feedback one at a time or in batch. The backend will call the real OpenAI API to extract sentiment, themes, and explicit action items or feature requests. Results will be stored in SQLite and shown in a React dashboard.
 
-## Stack
+## Planned Stack
 
 - Frontend: React, TypeScript, Vite
 - Backend: FastAPI, Python
 - Database: SQLite
 - LLM provider: OpenAI API
-- Eval harness: lightweight prompt regression checks
+- Stretch: prompt eval harness
 
-## Status
+## Planned Features
 
-Initial repo structure is in place. Application logic and dependencies have not been implemented yet.
+- Paste single or batch feedback
+- Extract sentiment: `positive`, `neutral`, or `negative`
+- Extract 1 to 3 short themes
+- Extract explicit action items or feature requests
+- Persist original feedback and extraction results
+- Show theme frequency, sentiment distribution, sentiment trend, and searchable feedback records
 
-## Planned Local Setup
+## Current Status
 
-Backend setup will be documented after dependencies are finalized.
+The repository scaffold and project-local harness docs are being prepared. Application logic and dependencies are not implemented yet.
 
-```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -r backend/requirements.txt
-uvicorn backend.app.main:app --reload
-```
+## Local Setup
 
-Frontend setup will be documented after dependencies are finalized.
-
-```powershell
-npm install --prefix frontend
-npm run dev --prefix frontend
-```
-
-## Environment
-
-Copy `.env.example` to `.env` when implementing the backend.
-
-Required values will include:
-
-- `OPENAI_API_KEY`
-- `DATABASE_URL`
+Final setup commands will be added after backend and frontend dependencies are intentionally introduced.
 
 ## Project Docs
 
-- `AGENTS.md`: project-local Codex and agent workflow instructions
-- `PLAN.md`: phased implementation plan
+- `AGENTS.md`: project-local Codex behavior and architecture rules
+- `PLAN.md`: phased build plan
 - `PROGRESS.md`: milestone tracker
-- `TODO.md`: next implementation tasks
+- `TODO.md`: role-based next tasks
 - `LOGS.md`: debugging and change log
 - `NOTES.md`: final submission notes outline
 - `harness/`: repo-local agent workflow docs

@@ -1,7 +1,30 @@
-# Implement Backend Prompt
+# Implement Backend Command Prompt
 
-Use this prompt for the first backend slice.
+Use for Phase 2 backend work.
 
-Prompt:
+```text
+You are Codex acting as the Backend Builder for Feedback Insights.
 
-Implement the smallest useful backend slice for Feedback Insights. Start with batch parsing, schemas, SQLite persistence, and dashboard aggregation only if needed for the slice. Add focused tests and run the narrowest useful backend verification command.
+Read AGENTS.md, PLAN.md, backend/README.md, harness/agents/backend-builder.md, and harness/skills/local-verification-loop.md.
+
+Owned paths:
+- backend/
+
+Forbidden paths during fan-out:
+- frontend/
+- root shared docs: PROGRESS.md, LOGS.md, PLAN.md, TODO.md
+- .codex, .claude, global config, and secret files
+
+Implement the smallest backend vertical slice:
+- batch parsing
+- API schemas
+- SQLite persistence
+- POST /feedback
+- GET /dashboard
+- GET /health
+- focused tests
+
+Use the real OpenAI API contract shape, but keep secret values in environment variables only.
+Run the narrowest useful backend checks.
+Write progress and results to harness/runs/backend-builder-report.md.
+```

@@ -1,23 +1,15 @@
-# Submission Notes Draft
+# Final Submission Notes
 
-Target length: about 500 words.
+Keep this under 500 words.
 
-## Problem Framing
+Do not write final notes until the app, verification, and eval results are complete.
 
-Placeholder for the final explanation of what the app does and why.
+## What I Built
 
-## Architecture Choices
-
-Placeholder for backend, frontend, database, and LLM design notes.
+## Architecture
 
 ## Agentic Workflow
 
-Placeholder for how Codex was used for planning, implementation, review, and verification.
+## Validation
 
-## Tradeoffs
-
-Placeholder for scope decisions, limitations, and future improvements.
-
-## Verification
-
-Placeholder for tests, eval results, and manual checks.
+## Tradeoffs and Next Steps

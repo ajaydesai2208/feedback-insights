@@ -8,7 +8,10 @@ from typing import Iterable
 
 from backend.app.models import FeedbackRecord
 from backend.app.schemas import ExtractionResult
+from backend.app.settings import load_local_environment
 
+
+load_local_environment()
 
 DEFAULT_DATABASE_PATH = Path(os.getenv("FEEDBACK_INSIGHTS_DB", "backend/feedback_insights.sqlite3"))
 

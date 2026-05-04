@@ -36,7 +36,29 @@ Install frontend dependencies:
 npm install --prefix frontend
 ```
 
-Set environment variables:
+Create a root `.env` file:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+Edit `.env` and add your own OpenAI key. Keep the file local; `.env` is ignored by git. The expected variable names and safe defaults are shown in `.env.example`.
+
+Run the backend in Terminal 1:
+
+```powershell
+uvicorn backend.app.main:app --reload
+```
+
+Run the frontend in Terminal 2:
+
+```powershell
+npm run dev --prefix frontend
+```
+
+Open the Vite URL, usually `http://localhost:5173`.
+
+Alternative: set environment variables directly in the terminal instead of using `.env`. Shell-provided values take precedence over root `.env` values.
 
 ```powershell
 $env:OPENAI_API_KEY = "your-api-key"
@@ -45,20 +67,6 @@ $env:FEEDBACK_INSIGHTS_DB = "backend/feedback_insights.sqlite3"
 $env:VITE_API_BASE_URL = "http://localhost:8000"
 ```
 
-Run the backend:
-
-```powershell
-uvicorn backend.app.main:app --reload
-```
-
-Run the frontend in another terminal:
-
-```powershell
-npm run dev --prefix frontend
-```
-
-Open the Vite URL, usually `http://localhost:5173`.
-
 ## Environment Variables
 
 - `OPENAI_API_KEY`: required for `POST /feedback` and provider-backed evals.
@@ -66,7 +74,7 @@ Open the Vite URL, usually `http://localhost:5173`.
 - `FEEDBACK_INSIGHTS_DB`: optional, defaults to `backend/feedback_insights.sqlite3`.
 - `VITE_API_BASE_URL`: optional, defaults to `http://localhost:8000`.
 
-Do not commit `.env` or real API keys. `.env.example` contains safe placeholders only.
+The backend automatically loads the root `.env` file with `override=False`, so terminal environment variables still win. Do not commit `.env` or real API keys. `.env.example` contains safe placeholders only.
 
 ## Backend Commands
 

@@ -279,3 +279,39 @@ Decision:
 
 Follow-up:
 - Final submission review.
+
+### 2026-05-04: Root Env Loading
+
+Context:
+- Improved local setup so reviewers can copy `.env.example` to a root `.env`, add their own OpenAI key, and start the backend without separately exporting shell variables.
+
+Commands:
+- `python -m pytest backend/tests`
+- `npm run build --prefix frontend`
+- `python -c "from fastapi.testclient import TestClient; from backend.app.main import app; print(app.title)"`
+- Checked whether `OPENAI_API_KEY` is visible without printing the value.
+- `git status --short`
+- `git grep -n "sk-" .`
+- `git grep -n "OPENAI_API_KEY=" .`
+- `git check-ignore -v .env`
+- Checked for generated SQLite files and removed the generated ignored SQLite database.
+
+Result:
+- Added backend root `.env` loading via `python-dotenv` with `override=False`.
+- Shell-provided environment variables still take precedence over `.env` values.
+- Updated root README and backend README setup flow.
+- Added a focused settings test for `.env` loading behavior.
+- Backend tests passed: 10 tests.
+- Frontend build/typecheck passed.
+- Backend import/startup validation passed.
+- `.env` is ignored by git.
+- `OPENAI_API_KEY` was not visible to the shell but was visible after backend root `.env` loading.
+- Provider-backed smoke using the key loaded from ignored `.env` passed: `POST /feedback` returned 201, persisted 2 records, and dashboard data was populated.
+- A local ignored `.env` exists and was not read or modified.
+- Temporary/generated SQLite databases were removed after verification.
+
+Decision:
+- Keep configuration local and simple; no new infrastructure or secret files are committed.
+
+Follow-up:
+- None for root `.env` setup.

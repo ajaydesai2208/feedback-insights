@@ -8,6 +8,10 @@ from pydantic import ValidationError
 
 from backend.app.extraction_prompt import EXTRACTION_SYSTEM_PROMPT
 from backend.app.schemas import ExtractionResult
+from backend.app.settings import load_local_environment
+
+
+load_local_environment()
 
 
 class LLMConfigurationError(RuntimeError):

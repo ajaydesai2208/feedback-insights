@@ -60,6 +60,13 @@
 - Wrote final submission notes in `NOTES.md`.
 - Moved remaining non-critical work into known limitations.
 
+### Local Setup Improvement
+
+- Added automatic loading of root `.env` values for the backend using `python-dotenv` with `override=False`.
+- Kept terminal-provided environment variables as the higher-priority configuration source.
+- Updated root and backend README setup instructions to lead with copying `.env.example` to `.env`.
+- Added a focused settings test for `.env` loading and shell precedence.
+
 ## Current Phase
 
 Phase 6 complete. Ready for final review/submission.

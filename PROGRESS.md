@@ -81,6 +81,12 @@
 - Confirmed themes, sentiment distribution, trend over time, and searchable feedback table populated with sentiment, themes, action items, and timestamps.
 - Observed one transient local "Failed to fetch" message during testing; backend records had persisted and refresh loaded them successfully.
 
+### Reliability Fix
+
+- Identified the transient browser fetch failure as a SQLite connection lifecycle bug: a connection yielded through FastAPI/Starlette threadpool handling could be used from a different thread.
+- Changed routes to open and close request-scoped SQLite connections inside each handler operation.
+- Added route tests for `POST /feedback` followed immediately by `GET /dashboard`, `GET /feedback`, and repeated read calls after inserts.
+
 ## Current Phase
 
 Phase 6 complete. Ready for final review/submission.

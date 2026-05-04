@@ -13,11 +13,12 @@ from backend.app.settings import load_local_environment
 
 load_local_environment()
 
-DEFAULT_DATABASE_PATH = Path(os.getenv("FEEDBACK_INSIGHTS_DB", "backend/feedback_insights.sqlite3"))
+def database_path() -> Path:
+    return Path(os.getenv("FEEDBACK_INSIGHTS_DB", "backend/feedback_insights.sqlite3"))
 
 
-def connect(database_path: Path | str = DEFAULT_DATABASE_PATH) -> sqlite3.Connection:
-    path = Path(database_path)
+def connect(database_path: Path | str | None = None) -> sqlite3.Connection:
+    path = Path(database_path) if database_path is not None else globals()["database_path"]()
     path.parent.mkdir(parents=True, exist_ok=True)
     connection = sqlite3.connect(path)
     connection.row_factory = sqlite3.Row

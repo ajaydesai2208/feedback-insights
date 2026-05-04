@@ -10,4 +10,6 @@ Third, I treated the eval harness as the meaningful stretch goal. It is not a la
 
 One thing that did not work cleanly was frontend/backend contract alignment. The frontend initially expected slightly different field names and a different sentiment distribution shape than the backend returned. Fan-in surfaced this quickly, and I fixed it by making the backend response shape canonical and updating frontend types/components to match. A second issue was provider verification from Codex: the command process could not see `OPENAI_API_KEY`, so provider-backed verification was completed manually from a local PowerShell process with secrets kept out of the repo.
 
+A final browser dry run also exposed a SQLite thread-lifecycle issue after successful writes. The fix was to tighten connection ownership so request handlers open and close their own SQLite connections instead of relying on a connection yielded across FastAPI worker-thread boundaries.
+
 If this were a long-lived project, I would add a small preflight harness command that validates environment visibility, dependency state, ignored artifacts, and API contract compatibility before agents fan out. I would keep hooks minimal; for this scope, documented commands, role ownership, reports, and verification loops were enough without adding runtime machinery.

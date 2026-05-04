@@ -364,3 +364,30 @@ Decision:
 
 Follow-up:
 - None.
+
+### 2026-05-04: SQLite Thread Lifecycle Reliability Fix
+
+Context:
+- Browser dry run showed records could persist successfully, but the frontend sometimes displayed `Failed to fetch` immediately after `POST /feedback`.
+- Backend logs showed `sqlite3.ProgrammingError` because a SQLite connection created in one thread was used in another FastAPI/Starlette worker-thread path.
+
+Commands:
+- `python -m pytest backend/tests`
+- `npm run build --prefix frontend`
+- `python -c "from fastapi.testclient import TestClient; from backend.app.main import app; print(app.title)"`
+
+Result:
+- Removed request handling reliance on a yielded SQLite connection that could cross thread boundaries.
+- Routes now open, initialize, use, and close SQLite connections inside each handler operation.
+- SQLite DB path handling remains unchanged from the user's perspective.
+- Added route tests for `POST /feedback` followed immediately by `GET /dashboard`, `POST /feedback` followed immediately by `GET /feedback`, and repeated dashboard/feedback reads after inserts.
+- Backend tests passed: 16 tests.
+- Frontend build/typecheck passed.
+- Backend import/startup validation passed.
+- Stopped a leftover local uvicorn process that was holding the generated ignored SQLite database, then removed that database file.
+
+Decision:
+- Prefer request/operation-scoped SQLite connections for this local demo instead of `check_same_thread=False` or a shared global connection.
+
+Follow-up:
+- Manual browser retest: remove generated SQLite DB, start backend, start frontend, submit a four-line batch, and confirm created records plus populated dashboard without `Failed to fetch`.

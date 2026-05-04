@@ -1,11 +1,11 @@
 """FastAPI application entrypoint."""
 
 from collections.abc import AsyncIterator, Iterator
-from contextlib import asynccontextmanager
-
-from fastapi import Depends, FastAPI, HTTPException, status
-from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager, contextmanager
 from sqlite3 import Connection
+
+from fastapi import FastAPI, HTTPException, status
+from fastapi.middleware.cors import CORSMiddleware
 
 from backend.app.dashboard import build_dashboard
 from backend.app.db import connect, initialize_database, list_feedback
@@ -41,7 +41,8 @@ app.add_middleware(
 )
 
 
-def get_connection() -> Iterator[Connection]:
+@contextmanager
+def open_connection() -> Iterator[Connection]:
     connection = connect()
     try:
         initialize_database(connection)
@@ -58,10 +59,10 @@ def health() -> HealthResponse:
 @app.post("/feedback", response_model=FeedbackCreateResponse, status_code=status.HTTP_201_CREATED)
 def create_feedback(
     request: FeedbackCreateRequest,
-    connection: Connection = Depends(get_connection),
 ) -> FeedbackCreateResponse:
     try:
-        records = ingest_feedback_batch(connection, request.text)
+        with open_connection() as connection:
+            records = ingest_feedback_batch(connection, request.text)
     except LLMConfigurationError as exc:
         raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)) from exc
     except LLMOutputError as exc:
@@ -73,10 +74,12 @@ def create_feedback(
 
 
 @app.get("/feedback", response_model=list[FeedbackRecordResponse])
-def get_feedback(connection: Connection = Depends(get_connection)) -> list[FeedbackRecordResponse]:
-    return list_feedback(connection)
+def get_feedback() -> list[FeedbackRecordResponse]:
+    with open_connection() as connection:
+        return list_feedback(connection)
 
 
 @app.get("/dashboard", response_model=DashboardResponse)
-def get_dashboard(connection: Connection = Depends(get_connection)) -> DashboardResponse:
-    return build_dashboard(list_feedback(connection))
+def get_dashboard() -> DashboardResponse:
+    with open_connection() as connection:
+        return build_dashboard(list_feedback(connection))

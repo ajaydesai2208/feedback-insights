@@ -2,19 +2,64 @@
 
 ## 2026-05-04
 
-- Created the initial project-local file and folder structure for Feedback Insights.
-- Added starter root docs, backend placeholders, frontend placeholders, eval placeholders, and repo-local harness docs.
-- Started refinement of `AGENTS.md`, planning docs, and `harness/` to document the Codex-native agent workflow.
-- Completed fan-in integration after Backend Builder, Frontend Builder, and Eval Agent branches were merged.
-- Aligned frontend API types with backend responses for feedback records and dashboard sentiment distribution.
-- Updated the extraction prompt and eval harness so provider-backed evals reuse the app prompt/schema contract.
-- Updated README setup and verification instructions for the implemented local app.
-- Completed Windows-friendly verification checkpoint: dependency installs, backend tests, backend import/startup, local uvicorn health check, frontend build, SQLite initialization, mocked API persistence/dashboard smoke, ignore checks, and eval dry run.
-- Documented the process visibility issue where Codex could not see `OPENAI_API_KEY` in its command process; this was a tooling/process issue, not an app failure.
-- Recorded sanitized manual provider-backed verification: `POST /feedback` returned 201, persisted 2 records, `GET /dashboard` returned populated summary data, and `python backend/evals/run_eval.py` evaluated 8 cases with 0 malformed outputs/provider failures.
-- Confirmed generated SQLite artifacts are ignored and were removed after verification.
-- Completed security review checkpoint: no tracked secret values or generated dependency/cache/database artifacts found, local CORS narrowed, feedback request size bounded, prompt-injection guidance strengthened, and eval failure reporting sanitized.
+### Structure
+
+- Created the project-local file and folder structure for Feedback Insights.
+- Added root docs, backend, frontend, eval, and harness placeholders.
+
+### Harness
+
+- Built the Codex-native project harness under `harness/`.
+- Added role cards for Orchestrator, Backend Builder, Frontend Builder, Extraction Eval Agent, and Review Agent.
+- Added reusable command prompts, project workflow playbooks, and `harness/runs/` reporting.
+
+### Architecture
+
+- Defined FastAPI + SQLite backend ownership.
+- Defined React + TypeScript + Vite frontend ownership.
+- Defined OpenAI extraction and eval harness contracts.
+- Documented no-secret, no-global-config, and file ownership rules in `AGENTS.md`.
+
+### Backend Swarm Branch
+
+- Implemented backend parsing, schemas, SQLite persistence, FastAPI routes, OpenAI wrapper, dashboard aggregation, and backend tests.
+- Added backend run/test documentation.
+
+### Frontend Swarm Branch
+
+- Implemented Vite React UI, feedback input, status states, dashboard components, searchable feedback table, and typed API client.
+- Added frontend build workflow and package lockfile.
+
+### Eval Swarm Branch
+
+- Added golden feedback examples, eval runner, eval report, and eval documentation.
+- Covered sentiment validity, theme extraction, action item intent, and malformed/provider failures.
+
+### Fan-In
+
+- Reconciled backend/frontend API contract mismatches.
+- Aligned frontend types/components to backend response shape.
+- Changed eval harness to reuse the app prompt and schema.
+- Updated setup and verification documentation.
+
+### Provider-Backed Verification
+
+- Completed manual provider-backed `POST /feedback` smoke from a local PowerShell process with secrets kept out of the repo.
+- Verified persisted rows and dashboard aggregation from provider-backed extraction.
+- Ran provider-backed eval with `gpt-4o-mini`: 8 cases, 0 malformed outputs/provider failures.
+
+### Security
+
+- Confirmed no tracked secret values or generated dependency/cache/database artifacts.
+- Narrowed local CORS, bounded feedback request size, strengthened prompt-injection guidance, and sanitized eval failure reporting.
+- Confirmed generated SQLite artifacts are ignored and removed after verification.
+
+### Final Docs
+
+- Finalized README setup/verification instructions.
+- Wrote final submission notes in `NOTES.md`.
+- Moved remaining non-critical work into known limitations.
 
 ## Current Phase
 
-Phase 6: Verification complete. Ready for final review and submission notes.
+Phase 6 complete. Ready for final review/submission.

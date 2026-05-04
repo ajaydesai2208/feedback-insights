@@ -1,8 +1,16 @@
 # Feedback Insights
 
-Feedback Insights is a local full-stack take-home project for Intryc AI.
+Feedback Insights is a local full-stack take-home project for Intryc AI. It lets one user paste customer feedback one at a time or in batch, sends each feedback entry to the OpenAI API for structured extraction, stores the original feedback and extraction in SQLite, and displays the results in a React dashboard.
 
-The app lets a single user paste customer feedback one at a time or in batch. The FastAPI backend calls the real OpenAI API to extract sentiment, themes, and explicit action items or feature requests. Results are stored in SQLite and shown in a React dashboard.
+## What It Does
+
+- Parses single, multiline, or CSV-ish pasted feedback.
+- Extracts sentiment: `positive`, `neutral`, or `negative`.
+- Extracts 1 to 3 short themes.
+- Extracts explicit action items or feature requests only.
+- Persists feedback and extraction results to SQLite.
+- Shows ranked themes, sentiment distribution, sentiment trend, and a searchable feedback table.
+- Includes a lightweight extraction eval harness as the stretch goal.
 
 ## Stack
 
@@ -10,18 +18,11 @@ The app lets a single user paste customer feedback one at a time or in batch. Th
 - Backend: FastAPI, Python
 - Database: SQLite
 - LLM provider: OpenAI API
-- Stretch: prompt eval harness
-
-## Features
-
-- Paste single or batch feedback
-- Extract sentiment: `positive`, `neutral`, or `negative`
-- Extract 1 to 3 short themes
-- Extract only explicit action items or feature requests
-- Persist original feedback and extraction results
-- Show theme frequency, sentiment distribution, sentiment trend, and searchable feedback records
+- Eval harness: Python script using the same app prompt/schema contract
 
 ## Local Setup
+
+From a fresh clone, run these commands from the repository root.
 
 Install backend dependencies:
 
@@ -56,42 +57,64 @@ Run the frontend in another terminal:
 npm run dev --prefix frontend
 ```
 
-The frontend defaults to `http://localhost:5173` and the backend defaults to `http://localhost:8000`.
+Open the Vite URL, usually `http://localhost:5173`.
 
-## Verification
+## Environment Variables
 
-Backend tests:
+- `OPENAI_API_KEY`: required for `POST /feedback` and provider-backed evals.
+- `OPENAI_MODEL`: optional, defaults to `gpt-4o-mini`.
+- `FEEDBACK_INSIGHTS_DB`: optional, defaults to `backend/feedback_insights.sqlite3`.
+- `VITE_API_BASE_URL`: optional, defaults to `http://localhost:8000`.
+
+Do not commit `.env` or real API keys. `.env.example` contains safe placeholders only.
+
+## Backend Commands
 
 ```powershell
 python -m pytest backend/tests
+python -c "from fastapi.testclient import TestClient; from backend.app.main import app; print(app.title)"
+uvicorn backend.app.main:app --reload
 ```
 
-Backend import/startup validation:
+## Frontend Commands
 
 ```powershell
-python -c "from fastapi.testclient import TestClient; from backend.app.main import app; client = TestClient(app); print(app.title)"
-```
-
-Frontend build and typecheck:
-
-```powershell
+npm install --prefix frontend
+npm run dev --prefix frontend
 npm run build --prefix frontend
 ```
 
-Eval harness dry run:
+## Eval Harness
+
+Run the extraction eval:
 
 ```powershell
 python backend/evals/run_eval.py
 ```
 
-If `OPENAI_API_KEY` is not set, the eval harness writes a skipped report and exits without calling the provider.
+If `OPENAI_API_KEY` is missing, the eval exits gracefully and writes a skipped report. With provider access, it writes aggregate results to `backend/evals/eval_report.md`.
 
-## Project Docs
+## Project Structure
 
-- `AGENTS.md`: project-local Codex behavior and architecture rules
-- `PLAN.md`: phased build plan
-- `PROGRESS.md`: milestone tracker
-- `TODO.md`: role-based next tasks
-- `LOGS.md`: debugging and change log
-- `NOTES.md`: final submission notes outline
-- `harness/`: repo-local agent workflow docs
+```text
+backend/          FastAPI app, SQLite persistence, OpenAI wrapper, tests, evals
+frontend/         React + TypeScript + Vite app
+harness/          Project-local Codex-native agent workflow docs and run reports
+AGENTS.md         Project-local coding and coordination rules
+PLAN.md           Phased build plan
+PROGRESS.md       Iteration and verification timeline
+LOGS.md           Debugging, verification, and security review log
+TODO.md           Final limitations and polish items
+NOTES.md          Final submission notes
+```
+
+## Agentic Workflow Docs
+
+This repo uses `AGENTS.md` and `harness/` as the project-local agentic coding harness. The harness documents the Orchestrator, Backend Builder, Frontend Builder, Extraction Eval Agent, and Review/Fan-in roles, plus reusable commands and run reports under `harness/runs/`.
+
+## Known Limitations
+
+- No auth, deployment, Docker, queues, Redis, or CI/CD by design.
+- `npm install` reports 2 moderate audit findings; they were not force-fixed to avoid broad dependency churn.
+- Route-level success tests with mocked extraction would be useful future polish.
+- The eval harness is intentionally lightweight and uses approximate scoring for themes/action intent.

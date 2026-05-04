@@ -30,3 +30,7 @@ Prompt or schema recommendations:
 Known issues:
 - The backend prompt and schema are placeholders in this branch, so `run_eval.py` carries a local eval prompt for now.
 - Provider-backed scoring requires `OPENAI_API_KEY` and the `openai` Python package.
+
+Fan-in resolution:
+- `backend/evals/run_eval.py` was updated to reuse the app extraction prompt and Pydantic schema, removing prompt/schema drift.
+- Provider-backed eval was completed manually from a local shell with secrets kept out of the repo.

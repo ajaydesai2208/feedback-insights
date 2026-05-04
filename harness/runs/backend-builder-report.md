@@ -45,3 +45,7 @@ Known issues:
 Next recommendations:
 - Frontend should consume `POST /feedback`, `GET /feedback`, and `GET /dashboard` using the documented response fields.
 - Fan-in should decide whether to keep the default SQLite path `backend/feedback_insights.sqlite3` or set `FEEDBACK_INSIGHTS_DB` for local runs.
+
+Fan-in resolution:
+- Frontend types/components were aligned to the backend response shape.
+- Local setup documents `FEEDBACK_INSIGHTS_DB`, with `backend/feedback_insights.sqlite3` as the default local SQLite path.

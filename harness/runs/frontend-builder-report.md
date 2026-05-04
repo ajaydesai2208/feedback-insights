@@ -47,3 +47,7 @@ Known issues:
 Next recommendations:
 - During fan-in, confirm the backend response field names match `frontend/src/types.ts`.
 - Decide separately whether to address the 2 moderate npm audit findings; I did not force dependency upgrades in this slice.
+
+Fan-in resolution:
+- Backend response fields were made canonical, and `frontend/src/types.ts` plus dependent components were updated to match.
+- The 2 moderate npm audit findings remain an accepted limitation because forced fixes would create broad dependency churn.

@@ -255,3 +255,25 @@ Decision:
 
 Follow-up:
 - Remaining risks are npm audit's 2 moderate findings and optional route-level success tests with mocked extraction.
+
+### 2026-05-04: Final Documentation
+
+Context:
+- Finalized submission-facing documentation after implementation, fan-in, provider-backed verification, and security review.
+
+Commands:
+- Documentation read pass over root docs, harness docs, run reports, backend docs, frontend docs, and eval docs.
+
+Result:
+- `README.md` now includes project overview, setup, environment variables, commands, eval harness, project structure, workflow docs, and known limitations.
+- `NOTES.md` was written as the final under-500-word submission note.
+- `PROGRESS.md` now shows the full iteration from structure through final docs.
+- `TODO.md` now lists only known limitations and future polish.
+- Harness run reports now include fan-in resolution notes for backend/frontend contract alignment and eval prompt/schema reuse.
+- Final submission review reran backend tests and frontend build successfully, then removed the generated ignored SQLite database file.
+
+Decision:
+- Keep hooks minimal/skipped for this scope; documented commands, owned paths, run reports, and verification loops were sufficient.
+
+Follow-up:
+- Final submission review.

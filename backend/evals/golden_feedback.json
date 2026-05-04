@@ -1,11 +1,74 @@
 [
   {
-    "id": "placeholder-001",
-    "feedback": "Placeholder feedback example. Replace with a realistic customer comment during eval setup.",
+    "id": "positive-onboarding-001",
+    "feedback": "Maya from customer success walked us through onboarding yesterday, and the new dashboard made it easy for my team to find risk accounts. The setup checklist saved us a ton of time.",
+    "expected": {
+      "sentiment": "positive",
+      "themes": ["onboarding", "dashboard usability", "customer success"],
+      "action_item_intents": []
+    }
+  },
+  {
+    "id": "negative-billing-002",
+    "feedback": "I am really frustrated that the invoice export failed three times this morning and support has not replied to my ticket from Monday. We cannot close month-end until this works.",
+    "expected": {
+      "sentiment": "negative",
+      "themes": ["billing export", "support response", "reliability"],
+      "action_item_intents": ["fix invoice export failures", "respond to support ticket"]
+    }
+  },
+  {
+    "id": "neutral-status-003",
+    "feedback": "We imported 420 survey responses today. The upload finished in about six minutes, and I will check the tagging results with our ops lead tomorrow.",
     "expected": {
       "sentiment": "neutral",
-      "themes": ["placeholder"],
-      "summary": "Placeholder expected summary."
+      "themes": ["data import", "tagging review"],
+      "action_item_intents": []
+    }
+  },
+  {
+    "id": "mixed-mobile-004",
+    "feedback": "The sentiment summary is usually accurate and saves our managers time, but the mobile layout is cramped and I keep missing the filter button when reviewing comments on my phone.",
+    "expected": {
+      "sentiment": "neutral",
+      "themes": ["sentiment accuracy", "mobile usability", "filters"],
+      "action_item_intents": ["improve mobile layout", "make filter button easier to use"]
+    }
+  },
+  {
+    "id": "feature-request-slack-005",
+    "feedback": "Could you add a Slack alert when a new enterprise account leaves negative feedback? Our CSMs want to jump in before the renewal call.",
+    "expected": {
+      "sentiment": "neutral",
+      "themes": ["slack alerts", "negative feedback", "customer success"],
+      "action_item_intents": ["add slack alert for negative enterprise feedback"]
+    }
+  },
+  {
+    "id": "support-process-006",
+    "feedback": "The product team answered my question eventually, but being bounced between chat, email, and my account manager was confusing. Please give customers one clear place to track support requests.",
+    "expected": {
+      "sentiment": "negative",
+      "themes": ["support process", "request tracking", "communication"],
+      "action_item_intents": ["provide one clear place to track support requests"]
+    }
+  },
+  {
+    "id": "product-usability-007",
+    "feedback": "I like the depth of the feedback table, but the theme editor is hard to discover. I only found bulk edit after a teammate sent me a screenshot.",
+    "expected": {
+      "sentiment": "neutral",
+      "themes": ["feedback table", "theme editor", "bulk edit discoverability"],
+      "action_item_intents": ["make theme editor and bulk edit easier to discover"]
+    }
+  },
+  {
+    "id": "cx-renewal-008",
+    "feedback": "Our renewal review went smoothly because Jenna pulled together the at-risk themes and action items before the meeting. We'd love the same report automatically sent every Friday.",
+    "expected": {
+      "sentiment": "positive",
+      "themes": ["renewal review", "risk themes", "scheduled reporting"],
+      "action_item_intents": ["send the report automatically every friday"]
     }
   }
 ]

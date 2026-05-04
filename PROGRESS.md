@@ -9,7 +9,11 @@
 - Aligned frontend API types with backend responses for feedback records and dashboard sentiment distribution.
 - Updated the extraction prompt and eval harness so provider-backed evals reuse the app prompt/schema contract.
 - Updated README setup and verification instructions for the implemented local app.
+- Completed Windows-friendly verification checkpoint: dependency installs, backend tests, backend import/startup, local uvicorn health check, frontend build, SQLite initialization, mocked API persistence/dashboard smoke, ignore checks, and eval dry run.
+- Documented the process visibility issue where Codex could not see `OPENAI_API_KEY` in its command process; this was a tooling/process issue, not an app failure.
+- Recorded sanitized manual provider-backed verification: `POST /feedback` returned 201, persisted 2 records, `GET /dashboard` returned populated summary data, and `python backend/evals/run_eval.py` evaluated 8 cases with 0 malformed outputs/provider failures.
+- Confirmed generated SQLite artifacts are ignored and were removed after verification.
 
 ## Current Phase
 
-Phase 5: Fan-in integration complete. Ready for Phase 6 final review and docs.
+Phase 6: Verification complete. Ready for final review and submission notes.

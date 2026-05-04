@@ -67,6 +67,20 @@
 - Updated root and backend README setup instructions to lead with copying `.env.example` to `.env`.
 - Added a focused settings test for `.env` loading and shell precedence.
 
+### UX/API Dry-Run Fix
+
+- Fixed batch parsing so one non-empty line remains one feedback entry, even when it contains commas or words like "but".
+- Kept multiline input and CSV-ish row parsing for batch use cases.
+- Added parser regression tests for natural-language commas, multiline batches, CSV feedback columns, and empty lines.
+
+### Final Browser Dry Run
+
+- Completed manual browser dry run with backend at `http://localhost:8000` and frontend at `http://localhost:5173`.
+- Confirmed root `.env` support worked for backend startup.
+- Submitted single feedback and a four-line multiline batch; records persisted and remained visible after refresh.
+- Confirmed themes, sentiment distribution, trend over time, and searchable feedback table populated with sentiment, themes, action items, and timestamps.
+- Observed one transient local "Failed to fetch" message during testing; backend records had persisted and refresh loaded them successfully.
+
 ## Current Phase
 
 Phase 6 complete. Ready for final review/submission.

@@ -5,6 +5,7 @@ Feedback Insights is a local full-stack take-home project for Intryc AI. It lets
 ## What It Does
 
 - Parses single, multiline, or CSV-ish pasted feedback.
+- Preserves each non-empty line as one feedback entry; commas and conjunctions inside a line are not split.
 - Extracts sentiment: `positive`, `neutral`, or `negative`.
 - Extracts 1 to 3 short themes.
 - Extracts explicit action items or feature requests only.

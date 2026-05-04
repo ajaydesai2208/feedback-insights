@@ -34,7 +34,7 @@ The API defaults to `http://localhost:8000`.
 ## Endpoints
 
 - `GET /health`: returns service status.
-- `POST /feedback`: accepts `{ "text": "..." }`, parses single, multiline, or CSV-ish pasted feedback, extracts insights with OpenAI, persists records, and returns created records.
+- `POST /feedback`: accepts `{ "text": "..." }`, preserves each non-empty line as one feedback entry, parses CSV-ish rows, extracts insights with OpenAI, persists records, and returns created records.
 - `GET /feedback`: returns persisted feedback records.
 - `GET /dashboard`: returns theme frequencies, sentiment distribution, sentiment trend, and feedback records.
 

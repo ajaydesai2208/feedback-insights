@@ -315,3 +315,52 @@ Decision:
 
 Follow-up:
 - None for root `.env` setup.
+
+### 2026-05-04: Batch Parser Dry-Run Fix
+
+Context:
+- Real browser dry run showed a single feedback sentence with a comma and "but" was split into multiple records.
+
+Commands:
+- `python -m pytest backend/tests`
+- `npm run build --prefix frontend`
+
+Result:
+- Updated batch parsing to preserve one non-empty line as one feedback entry.
+- CSV-ish input still creates one feedback entry per row.
+- CSV rows with a feedback/comment/text header use that column; rows without headers join non-empty columns into one feedback text.
+- Added regression tests for the dry-run sentence, multiline input, CSV-ish input, and empty-line handling.
+- Backend tests passed: 13 tests.
+- Frontend build/typecheck passed.
+- Stopped a leftover local uvicorn process that was holding the generated ignored SQLite database, then removed that database file.
+
+Decision:
+- Do not split natural-language feedback on punctuation, semicolons, commas, or conjunctions.
+
+Follow-up:
+- None.
+
+### 2026-05-04: Final Browser Dry Run
+
+Context:
+- Manual browser dry run of the local app after setup, parser, provider, and documentation fixes.
+
+Commands:
+- Manual browser run with backend at `http://localhost:8000` and frontend at `http://localhost:5173`.
+
+Result:
+- Backend health indicator was green.
+- Frontend loaded successfully.
+- Root `.env` support worked for local backend startup.
+- Single feedback submission worked.
+- Four-line multiline batch submission was processed and persisted.
+- After page refresh, dashboard loaded the persisted feedback records.
+- Themes, sentiment distribution, trend over time, and feedback table populated.
+- Searchable feedback table rendered records with sentiment, themes, action items, and timestamps.
+- One browser attempt briefly showed `Failed to fetch`; the backend had persisted the records, and a refresh loaded them successfully. Treated as a transient local dev-server/browser fetch issue, not an app blocker.
+
+Decision:
+- No application behavior changes needed from this dry run.
+
+Follow-up:
+- None.

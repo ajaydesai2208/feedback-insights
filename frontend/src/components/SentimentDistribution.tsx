@@ -1,14 +1,13 @@
-import type { SentimentDistributionItem } from "../types";
+import type { Sentiment, SentimentDistribution as SentimentDistributionData } from "../types";
 
 type SentimentDistributionProps = {
-  distribution: SentimentDistributionItem[];
+  distribution: SentimentDistributionData;
 };
 
-const SENTIMENTS = ["positive", "neutral", "negative"] as const;
+const SENTIMENTS: Sentiment[] = ["positive", "neutral", "negative"];
 
 export function SentimentDistribution({ distribution }: SentimentDistributionProps) {
-  const counts = new Map(distribution.map((item) => [item.sentiment, item.count]));
-  const total = distribution.reduce((sum, item) => sum + item.count, 0);
+  const total = SENTIMENTS.reduce((sum, sentiment) => sum + distribution[sentiment], 0);
 
   if (total === 0) {
     return <p className="empty-state">No sentiment data yet.</p>;
@@ -17,7 +16,7 @@ export function SentimentDistribution({ distribution }: SentimentDistributionPro
   return (
     <div className="distribution-list">
       {SENTIMENTS.map((sentiment) => {
-        const count = counts.get(sentiment) ?? 0;
+        const count = distribution[sentiment];
         const percent = Math.round((count / total) * 100);
 
         return (

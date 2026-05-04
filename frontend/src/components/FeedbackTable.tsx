@@ -15,7 +15,7 @@ export function FeedbackTable({ records }: FeedbackTableProps) {
 
     return records.filter((record) =>
       [
-        record.original_feedback,
+        record.feedback_text,
         record.sentiment,
         record.themes.join(" "),
         record.action_items.join(" "),
@@ -60,7 +60,7 @@ export function FeedbackTable({ records }: FeedbackTableProps) {
             <tbody>
               {filteredRecords.map((record) => (
                 <tr key={record.id}>
-                  <td>{record.original_feedback}</td>
+                  <td>{record.feedback_text}</td>
                   <td>
                     <span className={`sentiment sentiment-${record.sentiment}`}>{record.sentiment}</span>
                   </td>

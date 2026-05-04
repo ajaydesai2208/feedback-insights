@@ -9,9 +9,15 @@ type DashboardProps = {
 
 export function Dashboard({ dashboard }: DashboardProps) {
   const emptyDashboard: DashboardSummary = {
+    total_feedback: 0,
     theme_frequencies: [],
-    sentiment_distribution: [],
+    sentiment_distribution: {
+      positive: 0,
+      neutral: 0,
+      negative: 0,
+    },
     sentiment_trend: [],
+    feedback: [],
   };
   const data = dashboard ?? emptyDashboard;
 

@@ -18,6 +18,7 @@ frontend/dist/
 
 # SQLite
 *.db
+*.sqlite3
 *.db-shm
 *.db-wal
 

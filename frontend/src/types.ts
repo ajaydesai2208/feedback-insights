@@ -1,8 +1,8 @@
 export type Sentiment = "positive" | "neutral" | "negative";
 
 export type FeedbackRecord = {
-  id: string;
-  original_feedback: string;
+  id: number;
+  feedback_text: string;
   sentiment: Sentiment;
   themes: string[];
   action_items: string[];
@@ -14,10 +14,7 @@ export type ThemeFrequencyItem = {
   count: number;
 };
 
-export type SentimentDistributionItem = {
-  sentiment: Sentiment;
-  count: number;
-};
+export type SentimentDistribution = Record<Sentiment, number>;
 
 export type SentimentTrendItem = {
   date: string;
@@ -27,9 +24,11 @@ export type SentimentTrendItem = {
 };
 
 export type DashboardSummary = {
+  total_feedback: number;
   theme_frequencies: ThemeFrequencyItem[];
-  sentiment_distribution: SentimentDistributionItem[];
+  sentiment_distribution: SentimentDistribution;
   sentiment_trend: SentimentTrendItem[];
+  feedback: FeedbackRecord[];
 };
 
 export type SubmitFeedbackRequest = {

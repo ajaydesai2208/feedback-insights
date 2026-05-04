@@ -13,6 +13,13 @@ from typing import Any
 
 
 EVAL_DIR = Path(__file__).resolve().parent
+REPO_ROOT = EVAL_DIR.parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+from backend.app.extraction_prompt import EXTRACTION_SYSTEM_PROMPT
+from backend.app.schemas import ExtractionResult
+
 GOLDEN_PATH = EVAL_DIR / "golden_feedback.json"
 REPORT_PATH = EVAL_DIR / "eval_report.md"
 VALID_SENTIMENTS = {"positive", "neutral", "negative"}
@@ -41,21 +48,6 @@ STOPWORDS = {
     "us",
     "with",
 }
-
-
-SYSTEM_PROMPT = """You extract structured insights from customer feedback.
-Return only valid JSON with this shape:
-{
-  "sentiment": "positive" | "neutral" | "negative",
-  "themes": ["1 to 3 short theme strings"],
-  "action_items": ["explicit customer requests or action items only"]
-}
-
-Rules:
-- Use neutral for mixed feedback unless the overall tone is clearly positive or negative.
-- Themes must be short, concrete, and based on the feedback text.
-- Do not invent action items. If there is no explicit request or action, return an empty action_items list.
-"""
 
 
 @dataclass(frozen=True)
@@ -155,7 +147,7 @@ def extract_feedback(client: Any, model: str, feedback: str) -> dict[str, Any]:
     response = client.chat.completions.create(
         model=model,
         messages=[
-            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "system", "content": EXTRACTION_SYSTEM_PROMPT},
             {"role": "user", "content": feedback},
         ],
         response_format={"type": "json_object"},
@@ -171,27 +163,13 @@ def extract_feedback(client: Any, model: str, feedback: str) -> dict[str, Any]:
 
 
 def validate_output_shape(actual: dict[str, Any]) -> str | None:
-    missing = [field for field in ("sentiment", "themes", "action_items") if field not in actual]
-    if missing:
-        return f"Missing required field(s): {', '.join(missing)}"
+    try:
+        parsed = ExtractionResult.model_validate(actual)
+    except Exception as exc:
+        return f"Invalid extraction shape: {exc}"
 
-    if actual["sentiment"] not in VALID_SENTIMENTS:
-        return f"Invalid sentiment: {actual['sentiment']!r}"
-
-    if not isinstance(actual["themes"], list):
-        return "themes must be a list."
-
-    if not 1 <= len(actual["themes"]) <= 3:
-        return "themes must contain 1 to 3 items."
-
-    if any(not isinstance(theme, str) or len(theme.split()) > 5 for theme in actual["themes"]):
+    if any(len(theme.split()) > 5 for theme in parsed.themes):
         return "themes must be short strings."
-
-    if not isinstance(actual["action_items"], list):
-        return "action_items must be a list."
-
-    if any(not isinstance(item, str) for item in actual["action_items"]):
-        return "action_items must contain only strings."
 
     return None
 

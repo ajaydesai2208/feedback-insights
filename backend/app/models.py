@@ -1,3 +1,16 @@
-"""Database model placeholders."""
+"""Internal persisted data shapes."""
 
-# Persistent data shapes will be added during backend implementation.
+from dataclasses import dataclass
+
+
+Sentiment = str
+
+
+@dataclass(frozen=True)
+class FeedbackRecord:
+    id: int
+    feedback_text: str
+    sentiment: Sentiment
+    themes: list[str]
+    action_items: list[str]
+    created_at: str

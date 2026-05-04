@@ -2,12 +2,37 @@
 
 FastAPI backend for Feedback Insights.
 
-Planned responsibilities:
+## Setup
 
-- Accept pasted or uploaded batches of feedback.
-- Parse feedback into individual records.
-- Extract structured themes, sentiment, and summaries with the OpenAI API.
-- Store feedback and extracted insights in SQLite.
-- Serve dashboard aggregates to the frontend.
+```powershell
+python -m pip install -r backend/requirements.txt
+$env:OPENAI_API_KEY = "your-api-key"
+```
 
-Dependencies and run commands will be finalized during backend implementation.
+Optional environment variables:
+
+- `OPENAI_MODEL`: defaults to `gpt-4o-mini`
+- `FEEDBACK_INSIGHTS_DB`: defaults to `backend/feedback_insights.sqlite3`
+
+## Run
+
+```powershell
+uvicorn backend.app.main:app --reload
+```
+
+The API defaults to `http://localhost:8000`.
+
+## Endpoints
+
+- `GET /health`: returns service status.
+- `POST /feedback`: accepts `{ "text": "..." }`, parses single, multiline, or CSV-ish pasted feedback, extracts insights with OpenAI, persists records, and returns created records.
+- `GET /feedback`: returns persisted feedback records.
+- `GET /dashboard`: returns theme frequencies, sentiment distribution, sentiment trend, and feedback records.
+
+`POST /feedback` returns `503` when `OPENAI_API_KEY` is missing and does not use a production stub.
+
+## Test
+
+```powershell
+python -m pytest backend/tests
+```

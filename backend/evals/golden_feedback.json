@@ -1,0 +1,11 @@
+[
+  {
+    "id": "placeholder-001",
+    "feedback": "Placeholder feedback example. Replace with a realistic customer comment during eval setup.",
+    "expected": {
+      "sentiment": "neutral",
+      "themes": ["placeholder"],
+      "summary": "Placeholder expected summary."
+    }
+  }
+]

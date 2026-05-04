@@ -1,0 +1,1 @@
+// Feedback table component placeholder.

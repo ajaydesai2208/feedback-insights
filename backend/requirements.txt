@@ -1,0 +1,2 @@
+# Backend dependencies will be added during implementation.
+# Expected packages: fastapi, uvicorn, pydantic, openai, pytest.

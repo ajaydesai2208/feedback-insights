@@ -1,0 +1,1 @@
+// Sentiment distribution component placeholder.

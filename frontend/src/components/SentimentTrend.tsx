@@ -1,0 +1,1 @@
+// Sentiment trend component placeholder.

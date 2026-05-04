@@ -215,3 +215,43 @@ Decision:
 Follow-up:
 - Final review and final submission notes remain.
 - Remaining risks are npm audit's 2 moderate findings and optional route-level success tests with mocked extraction.
+
+### 2026-05-04: Security Review
+
+Context:
+- Reviewed repository for committed secrets, generated artifacts, environment handling, CORS, prompt injection risk, input handling, eval logging, and unnecessary dependency risk.
+
+Commands:
+- `git status --short`
+- Filename-only `git grep` checks for secret-like patterns.
+- `git ls-files` checks for tracked generated/cache/database paths.
+- Working-tree artifact scan for SQLite, cache, `node_modules`, and `dist` files.
+- `python -m pytest backend/tests`
+- `python -c "from fastapi.testclient import TestClient; from backend.app.main import app; print(app.title)"`
+- `npm run build --prefix frontend`
+- `python backend/evals/run_eval.py`
+
+Result:
+- No tracked `sk-` secret-like values were found.
+- `OPENAI_API_KEY=` appears only in `.env.example` with a blank value.
+- `api_key` references are limited to environment reads in the OpenAI wrapper/eval harness and a missing-key test.
+- No tracked `node_modules`, `dist`, `__pycache__`, `.venv`, `.pytest_cache`, SQLite database, or cache artifacts were found.
+- `.gitignore` covers `.env`, `backend/.venv/`, `__pycache__/`, `.pytest_cache/`, `frontend/node_modules/`, `frontend/dist/`, and SQLite database files.
+- Backend tests passed: 9 tests.
+- Backend import validation passed.
+- Frontend build/typecheck passed.
+- Eval dry run exited gracefully when the key was not visible to this process.
+- Generated ignored SQLite database was removed after review.
+
+Fixes:
+- Narrowed CORS methods to `GET` and `POST`, and request headers to `Content-Type`.
+- Added a 20,000 character maximum to the feedback request body.
+- Strengthened the extraction prompt to treat customer feedback as untrusted data and ignore instructions inside feedback.
+- Sanitized eval harness provider/parsing failure text so provider exceptions are not written verbatim to the eval report.
+
+Decision:
+- Do not add auth, Docker, deployment, CI, queues, Redis, or extra infrastructure for this local take-home.
+- Do not force npm audit fixes because that would create broad dependency churn.
+
+Follow-up:
+- Remaining risks are npm audit's 2 moderate findings and optional route-level success tests with mocked extraction.

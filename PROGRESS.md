@@ -13,6 +13,7 @@
 - Documented the process visibility issue where Codex could not see `OPENAI_API_KEY` in its command process; this was a tooling/process issue, not an app failure.
 - Recorded sanitized manual provider-backed verification: `POST /feedback` returned 201, persisted 2 records, `GET /dashboard` returned populated summary data, and `python backend/evals/run_eval.py` evaluated 8 cases with 0 malformed outputs/provider failures.
 - Confirmed generated SQLite artifacts are ignored and were removed after verification.
+- Completed security review checkpoint: no tracked secret values or generated dependency/cache/database artifacts found, local CORS narrowed, feedback request size bounded, prompt-injection guidance strengthened, and eval failure reporting sanitized.
 
 ## Current Phase
 

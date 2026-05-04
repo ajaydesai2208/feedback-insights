@@ -129,7 +129,7 @@ def run_case(client: Any, model: str, example: dict[str, Any]) -> CaseResult:
             expected=expected,
             actual=actual,
         )
-    except Exception as exc:  # Provider failures should be captured in the report.
+    except Exception as exc:  # Keep provider failure reports sanitized.
         return CaseResult(
             case_id=example["id"],
             sentiment_match=False,
@@ -137,7 +137,7 @@ def run_case(client: Any, model: str, example: dict[str, Any]) -> CaseResult:
             theme_overlap=0.0,
             action_intent_score=0.0,
             malformed=False,
-            error=f"{type(exc).__name__}: {exc}",
+            error=f"{type(exc).__name__}: provider or parsing failure",
             expected=expected,
             actual=None,
         )

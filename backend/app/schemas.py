@@ -9,7 +9,7 @@ Sentiment = Literal["positive", "neutral", "negative"]
 
 
 class FeedbackCreateRequest(BaseModel):
-    text: str = Field(..., min_length=1)
+    text: str = Field(..., min_length=1, max_length=20_000)
 
     @field_validator("text")
     @classmethod

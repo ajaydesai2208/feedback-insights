@@ -123,6 +123,7 @@ Follow-up:
 
 Context:
 - Re-ran verification after provider-backed `POST /feedback` smoke and provider-backed eval were requested.
+- Historical note: this Codex-process visibility issue was superseded by the later manual provider-backed verification entry.
 
 Commands:
 - Checked whether `OPENAI_API_KEY` is visible without printing the value.
@@ -164,6 +165,7 @@ Follow-up:
 
 Context:
 - Attempted to run only the remaining provider-backed verification checks after `OPENAI_API_KEY` was expected to be loaded before Codex launch.
+- Historical note: this Codex-process visibility issue was superseded by the later manual provider-backed verification entry.
 
 Commands:
 - Checked whether `OPENAI_API_KEY` is visible without printing the value.

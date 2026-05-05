@@ -57,6 +57,17 @@ Fan-in:
 3. Review Agent checks correctness and missing verification.
 4. Orchestrator updates root docs and remaining tasks.
 
+## Verification Loop
+
+Verification is explicit and project-local:
+
+- backend tests: `python -m pytest backend/tests`
+- frontend build: `npm run build --prefix frontend`
+- eval harness: `python backend/evals/run_eval.py`
+- browser dry run for the full local flow
+
+The eval agent owns the extraction eval harness and reports prompt/schema findings through `harness/runs/` before fan-in.
+
 ## Hooks
 
-Hooks are intentionally minimal or skipped for now. This project should stay easy to run locally. Add hooks only if they prevent a real repeated mistake and do not make setup heavier.
+I did not add a hook layer because this Codex workflow got more value from explicit commands, owned paths, and verification checkpoints. For this scope, hooks would have added ceremony without much signal.

@@ -97,6 +97,8 @@ Expected stored fields:
 
 Use SQLite for local development. Keep schema setup simple and reproducible.
 
+FastAPI routes should use request/operation-scoped SQLite connections. Do not share SQLite connection objects across requests or rely on a yielded dependency that can cross worker-thread boundaries.
+
 ## Verification Commands
 
 Do not run install commands until dependencies are intentionally added.

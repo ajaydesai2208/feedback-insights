@@ -27,8 +27,7 @@ Prompt or schema recommendations:
 - Require `action_items` to include explicit customer requests only and return an empty list when no request is present.
 - Treat mixed feedback as `neutral` unless the overall tone is clearly positive or negative.
 
-Known issues:
-- The backend prompt and schema are placeholders in this branch, so `run_eval.py` carries a local eval prompt for now.
+Known issues at branch completion:
 - Provider-backed scoring requires `OPENAI_API_KEY` and the `openai` Python package.
 
 Fan-in resolution:

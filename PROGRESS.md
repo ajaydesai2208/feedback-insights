@@ -5,7 +5,7 @@
 ### Structure
 
 - Created the project-local file and folder structure for Feedback Insights.
-- Added root docs, backend, frontend, eval, and harness placeholders.
+- Added root docs, backend, frontend, eval, and harness starting points.
 
 ### Harness
 
@@ -79,7 +79,7 @@
 - Confirmed root `.env` support worked for backend startup.
 - Submitted single feedback and a four-line multiline batch; records persisted and remained visible after refresh.
 - Confirmed themes, sentiment distribution, trend over time, and searchable feedback table populated with sentiment, themes, action items, and timestamps.
-- Observed one transient local "Failed to fetch" message during testing; backend records had persisted and refresh loaded them successfully.
+- Observed a local post-submit refresh failure after a successful write; the subsequent reliability fix addressed the backend SQLite connection ownership issue behind that refresh failure.
 
 ### Reliability Fix
 

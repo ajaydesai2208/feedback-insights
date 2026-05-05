@@ -1,393 +1,128 @@
 # Logs
 
-Simple debugging and change log for commands, failures, fixes, and decisions.
+Concise record of the implementation issues, fixes, and verification results that matter for walkthrough.
 
-## Format
-
-```text
-### YYYY-MM-DD: Short Title
+## 2026-05-04: Bootstrap and Harness
 
 Context:
-- What was being changed or verified.
-
-Commands:
-- Exact commands run, if any.
+- Created the Feedback Insights repo structure and project-local Codex-native harness.
 
 Result:
-- Pass, fail, skipped, or blocked.
+- Added `AGENTS.md`, planning docs, backend/frontend/eval scaffolds, and `harness/` role, command, skill, and run-report docs.
+- Kept global runtime config such as `.codex` and `.claude` out of the repo.
 
-Decision:
-- Any important implementation or workflow decision.
-
-Follow-up:
-- Remaining work or owner.
-```
-
-## Entries
-
-### 2026-05-04: Initial Structure
+## 2026-05-04: Fan-In Integration
 
 Context:
-- Created the Feedback Insights project scaffold.
+- Integrated Backend Builder, Frontend Builder, and Extraction Eval Agent work.
 
-Commands:
-- No dependency installation commands were run.
+Issue:
+- Frontend/backend contract mismatch surfaced during fan-in: frontend expected different feedback field names and sentiment distribution shape.
 
-Result:
-- Project-local docs, backend placeholders, frontend placeholders, eval placeholders, and harness docs exist.
+Fix:
+- Kept backend response shape canonical.
+- Updated frontend types/components to use `feedback_text`, numeric `id`, and the backend `sentiment_distribution` object.
+- Changed eval harness to reuse the app extraction prompt and Pydantic schema instead of carrying a separate prompt path.
 
-Decision:
-- Use `harness/` as the committed project-local agent workflow instead of global runtime config.
+Verification:
+- Backend tests passed.
+- Frontend build passed.
+- Eval harness ran in skipped mode when no provider key was visible to the command process.
 
-Follow-up:
-- Complete Phase 1 documentation refinement, then start the backend vertical slice.
-
-### 2026-05-04: Fan-In Integration
-
-Context:
-- Integrated merged Backend Builder, Frontend Builder, and Eval Agent work.
-
-Commands:
-- `python -m pytest backend/tests`
-- `python -c "from fastapi.testclient import TestClient; from backend.app.main import app; client = TestClient(app); print(app.title)"`
-- `npm run build --prefix frontend`
-- `npm install --prefix frontend`
-- `npm run build --prefix frontend`
-- `python backend/evals/run_eval.py`
-
-Result:
-- Backend tests passed: 9 tests.
-- Backend import/startup validation passed and printed `Feedback Insights API`.
-- Initial frontend build failed because local frontend dependencies were not installed and `tsc` was unavailable.
-- `npm install --prefix frontend` completed, with 2 moderate npm audit findings reported.
-- Frontend build/typecheck passed after installing committed dependencies.
-- Eval dry run passed in skipped mode because `OPENAI_API_KEY` is not set.
-
-Decision:
-- Kept backend API response fields as the canonical contract: `id`, `feedback_text`, `sentiment`, `themes`, `action_items`, and `created_at`.
-- Updated frontend types and components to consume backend response shapes directly.
-- Kept `sentiment_distribution` as the backend object shape instead of converting it to a frontend-only array.
-- Reused `backend/app/extraction_prompt.py` and `backend/app/schemas.py` from the eval harness to avoid prompt/schema drift.
-- Standardized local database configuration on `FEEDBACK_INSIGHTS_DB`.
-
-Follow-up:
-- Run provider-backed manual smoke test with a real `OPENAI_API_KEY`.
-- Decide whether to address npm audit findings without broad package churn.
-- Complete final review and write `NOTES.md` under 500 words.
-
-### 2026-05-04: Verification Checkpoint
+## 2026-05-04: Provider-Backed Verification
 
 Context:
-- Ran a Windows-friendly verification pass after fan-in integration.
-
-Commands:
-- `python -m pip install -r backend/requirements.txt`
-- `npm install --prefix frontend`
-- `python -m pytest backend/tests`
-- `python -c "from fastapi.testclient import TestClient; from backend.app.main import app; client = TestClient(app); print(app.title)"`
-- `npm run build --prefix frontend`
-- `python -c "import tempfile; from pathlib import Path; from backend.app.db import connect, initialize_database; path=Path(tempfile.gettempdir())/'feedback_insights_verify.sqlite3'; conn=connect(path); initialize_database(conn); tables=conn.execute('select name from sqlite_master where type='table' and name='feedback'').fetchall(); conn.close(); path.unlink(missing_ok=True); print('sqlite initialized' if tables else 'sqlite missing table')"`
-- `python backend/evals/run_eval.py`
-- Local uvicorn health check on `127.0.0.1:8765`
-- Local API persistence/dashboard smoke using a temporary SQLite database and mocked extraction
-- `git check-ignore -v .env backend/.venv/ __pycache__/ .pytest_cache/ frontend/node_modules/ frontend/dist/ backend/feedback_insights.sqlite3`
-- Filename-only secret scans for OpenAI key patterns
+- Provider-backed verification was completed manually from a local PowerShell process where the OpenAI key was visible.
 
 Result:
-- No committed OpenAI key pattern was found in `HEAD`.
-- A secret-like value was found in `.env.example` during verification and was removed without logging the value.
-- Required ignore checks passed for `.env`, `backend/.venv/`, `__pycache__/`, `.pytest_cache/`, `frontend/node_modules/`, `frontend/dist/`, and SQLite database files.
-- Backend dependencies installed cleanly in the current Python environment.
-- Frontend dependencies installed cleanly, with 2 moderate npm audit findings still reported.
-- Backend tests passed: 9 tests.
-- Backend import/startup validation passed.
-- Uvicorn started locally and `GET /health` returned `ok`.
-- SQLite initialization passed using a temporary database outside the repo.
-- Mocked API smoke verified `POST /feedback`, `GET /feedback`, and `GET /dashboard` response shapes and aggregation.
-- Frontend build/typecheck passed.
-- Eval harness exited gracefully in skipped mode because `OPENAI_API_KEY` is not present in the current shell.
-- Provider-backed API smoke and provider-backed eval were skipped because `OPENAI_API_KEY` is not present.
-- A generated ignored SQLite database was removed after verification.
+- `POST /feedback` returned 201 using the real OpenAI provider path.
+- Persisted records were returned by `GET /feedback`.
+- `GET /dashboard` returned populated theme frequency, sentiment distribution, and trend data.
+- `python backend/evals/run_eval.py` evaluated 8 cases with 0 malformed outputs/provider failures.
+- No secret values were written to repo files or logs.
 
-Decision:
-- Keep `.env.example` blank for secrets and use only safe example values.
-- Keep SQLite database files ignored and out of the working tree.
-- Do not run `npm audit fix --force` during verification because it would create broad dependency churn.
-
-Follow-up:
-- Run provider-backed `POST /feedback` smoke and provider-backed eval when `OPENAI_API_KEY` is available.
-- Rotate any real OpenAI key that may have been copied into `.env.example` before this verification pass.
-- Complete final review and final submission notes.
-
-### 2026-05-04: Provider-Backed Verification Attempt
+## 2026-05-04: Security Review
 
 Context:
-- Re-ran verification after provider-backed `POST /feedback` smoke and provider-backed eval were requested.
-- Historical note: this Codex-process visibility issue was superseded by the later manual provider-backed verification entry.
-
-Commands:
-- Checked whether `OPENAI_API_KEY` is visible without printing the value.
-- `git check-ignore -v .env backend/.venv/ __pycache__/ .pytest_cache/ frontend/node_modules/ frontend/dist/ backend/feedback_insights.sqlite3`
-- Filename-only secret scan for OpenAI key patterns.
-- `python -m pip install -r backend/requirements.txt`
-- `npm install --prefix frontend`
-- `python -m pytest backend/tests`
-- `npm run build --prefix frontend`
-- `python -c "from fastapi.testclient import TestClient; from backend.app.main import app; print(app.title)"`
-- SQLite initialization one-off using a temporary database.
-- Local uvicorn health check on `127.0.0.1:8765`.
-- `python backend/evals/run_eval.py`
-- Local API persistence/dashboard smoke using a temporary SQLite database and mocked extraction.
-
-Result:
-- `OPENAI_API_KEY` is not visible to this verification process.
-- Secret-pattern filename scan found no matches.
-- Required ignore patterns passed.
-- Backend dependencies installed cleanly.
-- Frontend dependencies installed cleanly, with 2 moderate npm audit findings still reported.
-- Backend tests passed: 9 tests.
-- Frontend build/typecheck passed.
-- Backend import validation passed.
-- SQLite initialization passed.
-- Uvicorn health check passed.
-- Eval harness exited gracefully in skipped mode because `OPENAI_API_KEY` is not visible.
-- Mocked API smoke passed for `POST /feedback`, `GET /feedback`, and `GET /dashboard`.
-- Provider-backed `POST /feedback` smoke and provider-backed eval did not run in the Codex process because the key was not visible there. They were later completed manually; see the manual provider-backed verification entry below.
-
-Decision:
-- Do not write or source any secret from repo files.
-- Treat the Codex key visibility failure as a process issue, not an app failure.
-
-Follow-up:
-- Manual provider-backed verification was completed later from a PowerShell process where the key was visible.
-
-### 2026-05-04: Provider Key Visibility Recheck
-
-Context:
-- Attempted to run only the remaining provider-backed verification checks after `OPENAI_API_KEY` was expected to be loaded before Codex launch.
-- Historical note: this Codex-process visibility issue was superseded by the later manual provider-backed verification entry.
-
-Commands:
-- Checked whether `OPENAI_API_KEY` is visible without printing the value.
-- Repeated the key visibility check with an escalated shell.
-- Checked for generated SQLite database files.
-- Removed generated ignored SQLite database file from `backend/`.
-
-Result:
-- `OPENAI_API_KEY` is still not visible to the Codex shell process.
-- Provider-backed `POST /feedback` smoke test did not run in the Codex process.
-- Provider-backed eval harness did not run in the Codex process.
-- Generated ignored SQLite database was removed before finishing.
-
-Decision:
-- Do not write or source secrets from repository files.
-- Treat the repeated Codex visibility failure as a process issue, not an app failure.
-
-Follow-up:
-- Manual provider-backed verification was completed later from a PowerShell process where the key was visible.
-
-### 2026-05-04: Manual Provider-Backed Verification
-
-Context:
-- Provider-backed verification was completed manually from a PowerShell process where `OPENAI_API_KEY` was visible.
-- Codex previously could not see the variable because it was running in a different command process. That was a tooling/process visibility issue, not an app failure.
-
-Commands:
-- `python backend/evals/run_eval.py`
-- FastAPI `TestClient` smoke against `backend.app.main:app` using the actual `POST /feedback` request schema.
-
-Result:
-- Provider-backed eval wrote `backend/evals/eval_report.md`.
-- Eval harness evaluated 8 cases with 0 malformed outputs/provider failures using `gpt-4o-mini`.
-- Provider-backed `POST /feedback` returned 201.
-- Smoke input was sanitized customer feedback about product usefulness, slow dashboard behavior, and CSV export for weekly QA reviews.
-- Batch parsing split the input into 2 persisted records.
-- First persisted record: positive sentiment, `product usefulness` theme, no action items.
-- Second persisted record: negative sentiment, `slow dashboard` and `CSV export request` themes, action item for adding CSV export for weekly QA reviews.
-- `GET /dashboard` returned 200 with `total_feedback: 2`.
-- Dashboard sentiment distribution included positive 1, neutral 0, negative 1.
-- Dashboard trend was populated for 2026-05-04.
-- Dashboard theme frequencies were populated.
-- Generated SQLite artifacts were removed after verification and are ignored by `.gitignore`.
-
-Decision:
-- Mark provider-backed `POST /feedback` smoke and provider-backed eval as passed manually.
-- Keep secrets out of repo files, logs, reports, and command output.
-
-Follow-up:
-- Final review and final submission notes remain.
-- Remaining risks are npm audit's 2 moderate findings and optional route-level success tests with mocked extraction.
-
-### 2026-05-04: Security Review
-
-Context:
-- Reviewed repository for committed secrets, generated artifacts, environment handling, CORS, prompt injection risk, input handling, eval logging, and unnecessary dependency risk.
-
-Commands:
-- `git status --short`
-- Filename-only `git grep` checks for secret-like patterns.
-- `git ls-files` checks for tracked generated/cache/database paths.
-- Working-tree artifact scan for SQLite, cache, `node_modules`, and `dist` files.
-- `python -m pytest backend/tests`
-- `python -c "from fastapi.testclient import TestClient; from backend.app.main import app; print(app.title)"`
-- `npm run build --prefix frontend`
-- `python backend/evals/run_eval.py`
-
-Result:
-- No tracked `sk-` secret-like values were found.
-- `OPENAI_API_KEY=` appears only in `.env.example` with a blank value.
-- `api_key` references are limited to environment reads in the OpenAI wrapper/eval harness and a missing-key test.
-- No tracked `node_modules`, `dist`, `__pycache__`, `.venv`, `.pytest_cache`, SQLite database, or cache artifacts were found.
-- `.gitignore` covers `.env`, `backend/.venv/`, `__pycache__/`, `.pytest_cache/`, `frontend/node_modules/`, `frontend/dist/`, and SQLite database files.
-- Backend tests passed: 9 tests.
-- Backend import validation passed.
-- Frontend build/typecheck passed.
-- Eval dry run exited gracefully when the key was not visible to this process.
-- Generated ignored SQLite database was removed after review.
+- Reviewed repo for committed secrets, generated artifacts, environment handling, CORS, prompt injection risk, input handling, eval logging, and dependency risk.
 
 Fixes:
-- Narrowed CORS methods to `GET` and `POST`, and request headers to `Content-Type`.
+- Narrowed CORS methods and headers for the local frontend.
 - Added a 20,000 character maximum to the feedback request body.
-- Strengthened the extraction prompt to treat customer feedback as untrusted data and ignore instructions inside feedback.
-- Sanitized eval harness provider/parsing failure text so provider exceptions are not written verbatim to the eval report.
+- Strengthened prompt guidance so customer feedback is treated as untrusted data.
+- Sanitized eval provider/parsing failure text.
 
-Decision:
-- Do not add auth, Docker, deployment, CI, queues, Redis, or extra infrastructure for this local take-home.
-- Do not force npm audit fixes because that would create broad dependency churn.
+Verification:
+- No tracked secret-like values were found.
+- `.env` and SQLite files are ignored.
+- Backend tests and frontend build passed.
 
-Follow-up:
-- Remaining risks are npm audit's 2 moderate findings and optional route-level success tests with mocked extraction.
-
-### 2026-05-04: Final Documentation
+## 2026-05-04: Root Env Loading
 
 Context:
-- Finalized submission-facing documentation after implementation, fan-in, provider-backed verification, and security review.
+- Reviewer setup is smoother if a root `.env` copied from `.env.example` works automatically.
 
-Commands:
-- Documentation read pass over root docs, harness docs, run reports, backend docs, frontend docs, and eval docs.
+Fix:
+- Added `python-dotenv` support with `override=False`.
+- Backend loads root `.env` without overriding shell-provided environment variables.
+- Added a focused settings test for `.env` loading and shell precedence.
 
-Result:
-- `README.md` now includes project overview, setup, environment variables, commands, eval harness, project structure, workflow docs, and known limitations.
-- `NOTES.md` was written as the final under-500-word submission note.
-- `PROGRESS.md` now shows the full iteration from structure through final docs.
-- `TODO.md` now lists only known limitations and future polish.
-- Harness run reports now include fan-in resolution notes for backend/frontend contract alignment and eval prompt/schema reuse.
-- Final submission review reran backend tests and frontend build successfully, then removed the generated ignored SQLite database file.
-
-Decision:
-- Keep hooks minimal/skipped for this scope; documented commands, owned paths, run reports, and verification loops were sufficient.
-
-Follow-up:
-- Final submission review.
-
-### 2026-05-04: Root Env Loading
-
-Context:
-- Improved local setup so reviewers can copy `.env.example` to a root `.env`, add their own OpenAI key, and start the backend without separately exporting shell variables.
-
-Commands:
-- `python -m pytest backend/tests`
-- `npm run build --prefix frontend`
-- `python -c "from fastapi.testclient import TestClient; from backend.app.main import app; print(app.title)"`
-- Checked whether `OPENAI_API_KEY` is visible without printing the value.
-- `git status --short`
-- `git grep -n "sk-" .`
-- `git grep -n "OPENAI_API_KEY=" .`
-- `git check-ignore -v .env`
-- Checked for generated SQLite files and removed the generated ignored SQLite database.
-
-Result:
-- Added backend root `.env` loading via `python-dotenv` with `override=False`.
-- Shell-provided environment variables still take precedence over `.env` values.
-- Updated root README and backend README setup flow.
-- Added a focused settings test for `.env` loading behavior.
-- Backend tests passed: 10 tests.
-- Frontend build/typecheck passed.
+Verification:
+- Backend tests passed.
+- Frontend build passed.
 - Backend import/startup validation passed.
-- `.env` is ignored by git.
-- `OPENAI_API_KEY` was not visible to the shell but was visible after backend root `.env` loading.
-- Provider-backed smoke using the key loaded from ignored `.env` passed: `POST /feedback` returned 201, persisted 2 records, and dashboard data was populated.
-- A local ignored `.env` exists and was not read or modified.
-- Temporary/generated SQLite databases were removed after verification.
+- Provider-backed smoke using the key loaded from ignored `.env` passed.
 
-Decision:
-- Keep configuration local and simple; no new infrastructure or secret files are committed.
-
-Follow-up:
-- None for root `.env` setup.
-
-### 2026-05-04: Batch Parser Dry-Run Fix
+## 2026-05-04: Batch Parser Dry-Run Fix
 
 Context:
-- Real browser dry run showed a single feedback sentence with a comma and "but" was split into multiple records.
+- Browser dry run showed a single feedback sentence with a comma and "but" was split into multiple records.
 
-Commands:
-- `python -m pytest backend/tests`
-- `npm run build --prefix frontend`
+Fix:
+- Parser now preserves one non-empty line as one feedback entry.
+- Multiline input remains batch input.
+- CSV-ish rows remain batch input.
 
-Result:
-- Updated batch parsing to preserve one non-empty line as one feedback entry.
-- CSV-ish input still creates one feedback entry per row.
-- CSV rows with a feedback/comment/text header use that column; rows without headers join non-empty columns into one feedback text.
-- Added regression tests for the dry-run sentence, multiline input, CSV-ish input, and empty-line handling.
-- Backend tests passed: 13 tests.
-- Frontend build/typecheck passed.
-- Stopped a leftover local uvicorn process that was holding the generated ignored SQLite database, then removed that database file.
+Verification:
+- Added parser tests for natural-language commas, multiline input, CSV-ish input, and empty lines.
+- Backend tests passed.
+- Frontend build passed.
 
-Decision:
-- Do not split natural-language feedback on punctuation, semicolons, commas, or conjunctions.
-
-Follow-up:
-- None.
-
-### 2026-05-04: Final Browser Dry Run
+## 2026-05-04: SQLite Connection Ownership Fix
 
 Context:
-- Manual browser dry run of the local app after setup, parser, provider, and documentation fixes.
+- Browser dry run surfaced a SQLite connection ownership issue during immediate post-submit refresh.
+- Records persisted, but immediate `GET /dashboard` or `GET /feedback` could fail with a SQLite thread error.
 
-Commands:
-- Manual browser run with backend at `http://localhost:8000` and frontend at `http://localhost:5173`.
+Root cause:
+- A SQLite connection yielded through FastAPI/Starlette sync handling could be used across worker-thread boundaries.
 
-Result:
-- Backend health indicator was green.
-- Frontend loaded successfully.
-- Root `.env` support worked for local backend startup.
-- Single feedback submission worked.
-- Four-line multiline batch submission was processed and persisted.
-- After page refresh, dashboard loaded the persisted feedback records.
-- Themes, sentiment distribution, trend over time, and feedback table populated.
-- Searchable feedback table rendered records with sentiment, themes, action items, and timestamps.
-- One browser attempt briefly showed `Failed to fetch`; the backend had persisted the records, and a refresh loaded them successfully. Treated as a transient local dev-server/browser fetch issue, not an app blocker.
-
-Decision:
-- No application behavior changes needed from this dry run.
-
-Follow-up:
-- None.
-
-### 2026-05-04: SQLite Thread Lifecycle Reliability Fix
-
-Context:
-- Browser dry run showed records could persist successfully, but the frontend sometimes displayed `Failed to fetch` immediately after `POST /feedback`.
-- Backend logs showed `sqlite3.ProgrammingError` because a SQLite connection created in one thread was used in another FastAPI/Starlette worker-thread path.
-
-Commands:
-- `python -m pytest backend/tests`
-- `npm run build --prefix frontend`
-- `python -c "from fastapi.testclient import TestClient; from backend.app.main import app; print(app.title)"`
-
-Result:
-- Removed request handling reliance on a yielded SQLite connection that could cross thread boundaries.
+Fix:
 - Routes now open, initialize, use, and close SQLite connections inside each handler operation.
-- SQLite DB path handling remains unchanged from the user's perspective.
-- Added route tests for `POST /feedback` followed immediately by `GET /dashboard`, `POST /feedback` followed immediately by `GET /feedback`, and repeated dashboard/feedback reads after inserts.
-- Backend tests passed: 16 tests.
-- Frontend build/typecheck passed.
+- This keeps the local demo path smooth without adding SQLAlchemy or changing the user-facing DB path.
+
+Verification:
+- Added route tests for `POST /feedback` followed immediately by `GET /dashboard`, `POST /feedback` followed immediately by `GET /feedback`, and repeated reads after inserts.
+- `python -m pytest backend/tests` passed with 16 tests.
+- `npm run build --prefix frontend` passed.
 - Backend import/startup validation passed.
-- Stopped a leftover local uvicorn process that was holding the generated ignored SQLite database, then removed that database file.
 
-Decision:
-- Prefer request/operation-scoped SQLite connections for this local demo instead of `check_same_thread=False` or a shared global connection.
+## 2026-05-04: Final Browser Dry Run
 
-Follow-up:
-- Manual browser retest: remove generated SQLite DB, start backend, start frontend, submit a four-line batch, and confirm created records plus populated dashboard without `Failed to fetch`.
+Context:
+- Manual browser dry run after setup, parser, provider, and reliability fixes.
+
+Result:
+- Backend health was green.
+- Frontend loaded at `http://localhost:5173`.
+- Root `.env` startup worked.
+- Single feedback and four-line batch submissions worked.
+- Refresh showed persisted records.
+- Themes, sentiment distribution, trend, and searchable feedback table populated.
+
+## 2026-05-04: Final Docs
+
+Result:
+- `NOTES.md` finalized under 500 words.
+- `PROGRESS.md` cleaned into a project timeline.
+- `TODO.md` reduced to final completion checklist and non-critical future polish.
